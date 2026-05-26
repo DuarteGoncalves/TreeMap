@@ -1,5 +1,5 @@
+import { MapOverlayProvider } from '@/components/map/MapOverlayProvider'
 import type { ReactNode } from 'react'
-import { Providers } from './providers'
 
 export default function RootLayout({
   children,
@@ -9,7 +9,7 @@ export default function RootLayout({
   return (
     <html lang="pt">
       <body style={{ margin: 0 }}>
-        <Providers>{children}</Providers>
+        <MapOverlayProvider>{children}</MapOverlayProvider>
       </body>
     </html>
   )

@@ -11,10 +11,10 @@ export default function MapLayout({
   return (
     <Box
       sx={{
-        position: 'relative',
-        width: '100vw',
-        height: '100vh',
+        position: 'fixed',
+        inset: 0,
         overflow: 'hidden',
+        touchAction: 'none',
       }}
     >
       {children}
