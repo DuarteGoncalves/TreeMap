@@ -11,8 +11,25 @@ export const getUserFromName = async (name: string) => {
   return db.select().from(users).where(eq(users.name, name))
 }
 
+export const getTreeById = async (treeId: string) => {
+  const result = await db
+    .select()
+    .from(trees)
+    .where(eq(trees.id, treeId))
+  return result[0]
+}
+
 export const createTree = async (data: Tree) => {
   const result = await db.insert(trees).values(data).returning()
+  return result[0]
+}
+
+export const updateTree = async (userId: string, data: Tree) => {
+  const result = await db
+    .update(trees)
+    .set(data)
+    .where(and(eq(trees.id, data.id), eq(trees.userId, userId)))
+    .returning()
   return result[0]
 }
 
