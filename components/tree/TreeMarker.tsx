@@ -4,11 +4,26 @@ import { useState } from 'react'
 import TreeDialog from './TreeDialog'
 import { Tree } from '@/types'
 import { MapAnchor } from '../map/components/MapAnchor'
-import { removeTree, updateTree } from './treeStore'
+import { removeTree, updateTree } from '../../lib/treeStore'
 import MapCrosshair from '../location/MapCrosshair'
 import ConfirmMoveButton from '../location/ConfirmMoveButton'
 
-export default function TreeMarker({ tree }: { tree: Tree }) {
+const getSelectedStyle = (isSelected: boolean) =>
+  isSelected
+    ? {
+        outline: '2px dashed orange',
+        outlineOffset: '2px',
+        borderRadius: '50%',
+      }
+    : {}
+
+export default function TreeMarker({
+  tree,
+  isSelected,
+}: {
+  tree: Tree
+  isSelected: boolean
+}) {
   const [open, setOpen] = useState(false)
   const [moveMode, setMoveMode] = useState(false)
 
@@ -61,6 +76,9 @@ export default function TreeMarker({ tree }: { tree: Tree }) {
             cursor: 'pointer',
             fontSize: 24,
             userSelect: 'none',
+            transition:
+              'box-shadow 0.2s, outline 0.2s, background 0.2s',
+            ...getSelectedStyle(isSelected),
           }}
         >
           {tree.species === 'olive' ? '🫒' : '🌲'}

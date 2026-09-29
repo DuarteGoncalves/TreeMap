@@ -2,10 +2,10 @@
 
 import { useEffect } from 'react'
 import TreeMarker from './TreeMarker'
-import { useTrees, setTrees } from '@/components/tree/treeStore'
+import { useTrees, setTrees } from '@/lib/treeStore'
 
 export function TreesLayer() {
-  const trees = useTrees()
+  const treesState = useTrees()
 
   useEffect(() => {
     async function load() {
@@ -18,10 +18,19 @@ export function TreesLayer() {
     load()
   }, [])
 
+  const { trees, selection } = treesState ?? {
+    trees: [],
+    selection: [],
+  }
+
   return (
     <>
-      {trees?.map((tree) => (
-        <TreeMarker key={tree.id} tree={tree} />
+      {trees.map((tree) => (
+        <TreeMarker
+          key={tree.id}
+          tree={tree}
+          isSelected={selection.includes(tree.id)}
+        />
       ))}
     </>
   )
