@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react'
 import { getMap } from '../mapRef'
-import { Coordinates } from '@/types'
 
-export function useProjectedPoint({ lat, lng }: Coordinates) {
+export function useProjectedPoint({
+  lat,
+  lng,
+}: {
+  lat: number
+  lng: number
+}) {
   const [pos, setPos] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
