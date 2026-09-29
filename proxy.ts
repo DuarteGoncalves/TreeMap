@@ -1,15 +1,22 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { auth0 } from './lib/auth0'
 
-export async function proxy(request: Request | NextRequest) {
-  const authResponse = await auth0.middleware(request)
+const PUBLIC_PATHS = ['/auth']
 
-  // Always return the auth response.
-  //
-  // Note: The auth response forwards requests to your app routes by default.
-  // If you need to block requests, do it before calling auth0.middleware() or
-  // copy the authResponse headers except for x-middleware-next to your blocking response.
-  return authResponse
+export async function proxy(request: NextRequest) {
+  const pathname = request.nextUrl.pathname
+
+  const isPublicPath = PUBLIC_PATHS.some((path) =>
+    pathname.startsWith(path)
+  )
+
+  const session = await auth0.getSession(request)
+
+  if (!session && !isPublicPath) {
+    return NextResponse.redirect(new URL('/auth/login', request.url))
+  }
+
+  return await auth0.middleware(request)
 }
 
 export const config = {
