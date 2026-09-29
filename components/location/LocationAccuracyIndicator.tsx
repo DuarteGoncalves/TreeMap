@@ -1,7 +1,7 @@
 'use client'
 
 import { Box, Paper, Stack, Typography } from '@mui/material'
-import { useCurrentLocation } from '@/components/location/locationStore'
+import { useCurrentLocation } from '@/lib/locationStore'
 
 export default function LocationAccuracyIndicator() {
   const location = useCurrentLocation()

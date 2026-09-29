@@ -1,39 +1,15 @@
 'use client'
 
-import { alpha, Box, Fab, keyframes } from '@mui/material'
+import { Box, IconButton } from '@mui/material'
 import MyLocationIcon from '@mui/icons-material/MyLocation'
-import MyLocationTwoToneIcon from '@mui/icons-material/MyLocationTwoTone'
+
 import LocationDisabledTwoToneIcon from '@mui/icons-material/LocationDisabledTwoTone'
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord'
 import StopIcon from '@mui/icons-material/Stop'
-import { setCurrentLocation } from './locationStore'
+import { setCurrentLocation } from '../../lib/locationStore'
 import { useRef, useState } from 'react'
 import { getMap } from '../map/mapRef'
-import { MapAnchor } from '../map/components/MapAnchor'
-
-const pulse = keyframes`
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1);
-  }
-  65% {
-    transform: scale(1.2);
-  }
-  75% {
-    transform: scale(1);
-  }
-  80% {
-    transform: scale(1);
-  }
-  90% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-  }
-`
+import { FloatingIconContainer } from '../menu/BottomRightMenu'
 
 let recordedCoords: GeolocationCoordinates[] = []
 
@@ -47,15 +23,15 @@ const weightedAverage = (
   let totalWeight = 0
   let accuracySum = 0
 
-  for (const s of samples) {
-    const accuracy = Math.max(s.accuracy, 1)
+  for (const sample of samples) {
+    const accuracy = Math.max(sample.accuracy, 1)
     const weight = 1 / accuracy
 
-    lat += s.latitude * weight
-    lng += s.longitude * weight
+    lat += sample.latitude * weight
+    lng += sample.longitude * weight
     totalWeight += weight
 
-    accuracySum += s.accuracy
+    accuracySum += sample.accuracy
   }
 
   const avgLat = lat / totalWeight
@@ -72,12 +48,18 @@ const weightedAverage = (
   }
 }
 
-export default function LocateButton() {
-  const watchId = useRef<number | null>(null)
+interface LocateButtonProps {
+  setPinLocation: React.Dispatch<
+    React.SetStateAction<GeolocationCoordinates | null>
+  >
+}
+
+export default function LocateButton({
+  setPinLocation,
+}: LocateButtonProps) {
   const [tracking, setTracking] = useState(false)
+  const watchId = useRef<number | null>(null)
   const [recording, setRecording] = useState(false)
-  const [pinLocation, setPinLocation] =
-    useState<GeolocationCoordinates>()
 
   const handleSetCurrentLocation: PositionCallback = ({ coords }) => {
     setCurrentLocation(coords)
@@ -121,6 +103,8 @@ export default function LocateButton() {
       navigator.geolocation.clearWatch(watchId.current)
       watchId.current = null
       setTracking(false)
+      setPinLocation(null)
+      setCurrentLocation(null)
       return
     }
 
@@ -148,67 +132,43 @@ export default function LocateButton() {
   }
 
   return (
-    <>
-      {tracking && (
-        <Fab
-          size="small"
-          onClick={recording ? toggleLocate : toggleAverageLocation}
-          sx={{
-            position: 'absolute',
-            bottom: ({ spacing }) => spacing(2),
-            right: ({ spacing }) => spacing(10),
-            pointerEvents: 'auto',
-          }}
-          color={recording ? 'success' : 'error'}
-        >
-          {recording ? <StopIcon /> : <FiberManualRecordIcon />}
-        </Fab>
-      )}
-      <Fab
-        color="primary"
-        onClick={toggleLocate}
+    <Box
+      sx={{
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Box
         sx={{
           position: 'absolute',
-          bottom: 16,
-          right: 16,
-          pointerEvents: 'auto',
+          right: tracking ? 48 : 0,
+          opacity: tracking ? 1 : 0,
+          pointerEvents: tracking ? 'auto' : 'none',
+          transition: 'all 200ms ease',
         }}
       >
-        {tracking ? (
-          <LocationDisabledTwoToneIcon />
-        ) : (
-          <MyLocationIcon />
-        )}
-      </Fab>
-      {pinLocation && (
-        <MapAnchor
-          lng={pinLocation.longitude}
-          lat={pinLocation.latitude}
-        >
-          <Box
-            sx={{
-              width: ({ spacing }) => spacing(4),
-              height: ({ spacing }) => spacing(4),
-              borderRadius: '50%',
-              bgcolor: (theme) =>
-                alpha(theme.palette.primary.dark, 0.6),
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
+        <FloatingIconContainer>
+          <IconButton
+            size="small"
+            onClick={recording ? toggleLocate : toggleAverageLocation}
+            color={recording ? 'success' : 'error'}
           >
-            <MyLocationTwoToneIcon
-              color="disabled"
-              sx={{
-                color: 'white',
-                animation: tracking
-                  ? `${pulse} 1s infinite`
-                  : undefined,
-              }}
-            />
-          </Box>
-        </MapAnchor>
-      )}
-    </>
+            {recording ? <StopIcon /> : <FiberManualRecordIcon />}
+          </IconButton>
+        </FloatingIconContainer>
+      </Box>
+
+      <FloatingIconContainer>
+        <IconButton color="primary" onClick={toggleLocate}>
+          {tracking ? (
+            <LocationDisabledTwoToneIcon />
+          ) : (
+            <MyLocationIcon />
+          )}
+        </IconButton>
+      </FloatingIconContainer>
+    </Box>
   )
 }

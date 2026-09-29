@@ -9,10 +9,12 @@ import {
   Button,
   DialogContent,
   Typography,
+  IconButton,
 } from '@mui/material'
 import AddLocationIcon from '@mui/icons-material/AddLocation'
-import { useCurrentLocation } from './locationStore'
-import { addTree } from '../tree/treeStore'
+import { useCurrentLocation } from '../../lib/locationStore'
+import { addTree } from '../../lib/treeStore'
+import { FloatingIconContainer } from '../menu/BottomRightMenu'
 
 export default function AddLocationButton() {
   const location = useCurrentLocation()
@@ -61,20 +63,14 @@ export default function AddLocationButton() {
   }
 
   return (
-    <>
-      <Fab
+    <FloatingIconContainer>
+      <IconButton
         color="secondary"
         onClick={handleClick}
         disabled={!location || loading}
-        sx={{
-          position: 'absolute',
-          bottom: ({ spacing }) => spacing(10),
-          right: ({ spacing }) => spacing(2),
-          pointerEvents: 'auto',
-        }}
       >
         <AddLocationIcon />
-      </Fab>
+      </IconButton>
 
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Adicionar árvore</DialogTitle>
@@ -103,6 +99,6 @@ export default function AddLocationButton() {
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </FloatingIconContainer>
   )
 }

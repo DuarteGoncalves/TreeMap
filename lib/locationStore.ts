@@ -3,7 +3,9 @@ import { useSyncExternalStore } from 'react'
 let currentLocation: GeolocationCoordinates | null = null
 const listeners = new Set<() => void>()
 
-export function setCurrentLocation(coords: GeolocationCoordinates) {
+export function setCurrentLocation(
+  coords: GeolocationCoordinates | null
+) {
   currentLocation = coords
   listeners.forEach((l) => l())
 }
